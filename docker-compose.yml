@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: evofit
+      POSTGRES_USER: evofit
+      POSTGRES_PASSWORD: ${EVOFIT_DB_PASSWORD:?Set EVOFIT_DB_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evofit -d evofit"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  api:
+    build: ./api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/evofit
+      SPRING_DATASOURCE_USERNAME: evofit
+      SPRING_DATASOURCE_PASSWORD: ${EVOFIT_DB_PASSWORD:?Set EVOFIT_DB_PASSWORD in .env}
+      EVOFIT_ADMIN_PASSWORD: ${EVOFIT_ADMIN_PASSWORD:?Set EVOFIT_ADMIN_PASSWORD in .env}
+      EVOFIT_MEDIA_SIGNING_KEY: ${EVOFIT_MEDIA_SIGNING_KEY:?Set EVOFIT_MEDIA_SIGNING_KEY in .env}
+      EVOFIT_MEDIA_DIR: /app/media
+      EVOFIT_OPEN_DAYS: ${EVOFIT_OPEN_DAYS:-MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY}
+      EVOFIT_OPEN_TIME: ${EVOFIT_OPEN_TIME:-06:00}
+      EVOFIT_CLOSE_TIME: ${EVOFIT_CLOSE_TIME:-22:00}
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - media_data:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    build: ./web
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+volumes:
+  postgres_data:
+  media_data:

@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/evofit}
+    username: ${SPRING_DATASOURCE_USERNAME:evofit}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  servlet:
+    multipart:
+      max-file-size: 250MB
+      max-request-size: 250MB
+  flyway:
+    enabled: true
+server:
+  error:
+    include-message: always
+evofit:
+  admin-password: ${EVOFIT_ADMIN_PASSWORD:}
+  media-signing-key: ${EVOFIT_MEDIA_SIGNING_KEY:}
+  media-dir: ${EVOFIT_MEDIA_DIR:./data/media}
+  open-days: ${EVOFIT_OPEN_DAYS:MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY}
+  open-time: ${EVOFIT_OPEN_TIME:06:00}
+  close-time: ${EVOFIT_CLOSE_TIME:22:00}
